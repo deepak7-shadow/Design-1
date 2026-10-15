@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>RANN MAHAL — Where the Desert Keeps its Gold</title>
+  <meta name="description" content="Rann Mahal · Thar Frontier, Rajasthan. Nine suites. Four hundred lanterns. One family at a time. A luxury heritage desert sanctuary.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --gold-primary: #D4AF37;
+      --gold-light: #EEDB98;
+      --gold-soft: #c8a355;
+      --gold-dark: #8C6D23;
+      --gold-glow: rgba(212, 175, 55, 0.35);
+      --sand-light: #F4ECE1;
+      --sand-muted: rgba(244, 236, 225, 0.72);
+      --bg-dark: #0D0A08;
+      --panel-bg: rgba(18, 14, 11, 0.88);
+      --panel-border: rgba(212, 175, 55, 0.22);
+      --font-display: 'Cinzel', serif;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-sans: 'Montserrat', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html {
+      width: 100%;
+      min-height: 100%;
+      background-color: var(--bg-dark);
+      overflow-x: hidden;
+      overflow-y: scroll;
+    }
+
+    body {
+      width: 100%;
+      min-height: 100%;
+      background-color: var(--bg-dark);
+      color: var(--sand-light);
+      font-family: var(--font-sans);
+      overflow-x: hidden;
+      cursor: default;
+      position: relative;
+    }
+
+    /* Scroll Height Container to drive the cinematic scrub */
+    #scroll-container {
+      height: 500vh;
+      position: relative;
+      width: 100%;
+      pointer-events: none;
+    }
+
+    /* Fixed Viewport Shell */
+    #viewport-shell {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Background Canvas */
+    #canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      background: #090705;
+    }
+
+    canvas#scene-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    /* Grain and atmospheric subtle vignette */
+    .vignette-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0) 45%, rgba(10,8,6,0.55) 100%),
+                  linear-gradient(180deg, rgba(8,6,4,0.4) 0%, transparent 15%, transparent 85%, rgba(8,6,4,0.6) 100%);
+    }
+
+    /* Luxury Custom Cursor */
+    .custom-cursor {
+      position: fixed;
+      width: 32px;
+      height: 32px;
+      border: 1px solid rgba(229, 195, 120, 0.65);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+      mix-blend-mode: difference;
+    }
+
+    .custom-cursor-dot {
+      position: fixed;
+      width: 4px;
+      height: 4px;
+      background: var(--gold-light);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10000;
+      transform: translate(-50%, -50%);
+    }
+
+    .cursor-hover {
+      width: 56px;
+      height: 56px;
+      background: rgba(212, 175, 55, 0.12);
+      border-color: var(--gold-light);
+    }
+
+    /* Top Navigation Header */
+    header.site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 26px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      pointer-events: auto;
+      background: linear-gradient(180deg, rgba(10,8,6,0.6) 0%, transparent 100%);
+      backdrop-filter: blur(1px);
+    }
+
+    .nav-group-left, .nav-group-right {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+    }
+
+    .nav-link {
+      font-family: var(--font-sans);
+      font-size: 0.68rem;
+      font-weight: 400;
+      letter-spacing: 0.32em;
+      color: rgba(244, 236, 225, 0.85);
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      position: relative;
+      padding: 6px 0;
+      transition: color 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0%;
+      height: 1px;
+      background: var(--gold-primary);
+      transition: width 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--gold-light);
+      text-shadow: 0 0 10px var(--gold-glow);
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    /* Center Brand Logo */
+    .brand-logo {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 500;
+      letter-spacing: 0.58em;
+      color: var(--sand-light);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+      transition: color 0.3s ease;
+    }
+
+    .brand-logo .line {
+      width: 24px;
+      height: 1px;
+      background: rgba(212, 175, 55, 0.6);
+    }
+
+    .brand-logo:hover {
+      color: var(--gold-light);
+    }
+
+    /* Reserve Pill Button */
+    .reserve-btn {
+      font-family: var(--font-sans);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--sand-light);
+      background: rgba(24, 18, 14, 0.45);
+      border: 1px solid rgba(212, 175, 55, 0.55);
+      padding: 10px 24px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 18px rgba(0,0,0,0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .reserve-btn:hover {
+      background: var(--gold-primary);
+      color: #0d0a08;
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 24px var(--gold-glow);
+      transform: translateY(-1px);
+    }
+
+    /* Sound Toggle Pill */
+    .sound-toggle-btn {
+      font-family: var(--font-sans);
+      font-size: 0.62rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      background: transparent;
+      border: 1px solid rgba(212, 175, 55, 0.28);
+      color: var(--gold-light);
+      padding: 8px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.3s ease;
+    }
+
+    .sound-toggle-btn:hover {
+      border-color: var(--gold-light);
+      background: rgba(212, 175, 55, 0.1);
+    }
+
+    .sound-wave {
+      display: inline-flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 12px;
+    }
+
+    .sound-wave span {
+      width: 2px;
+      height: 100%;
+      background-color: var(--gold-primary);
+      border-radius: 1px;
+      transition: height 0.2s ease;
+    }
+
+    .sound-wave.playing span:nth-child(1) { animation: waveAnim 1s ease-in-out infinite 0.1s; }
+    .sound-wave.playing span:nth-child(2) { animation: waveAnim 1s ease-in-out infinite 0.3s; }
+    .sound-wave.playing span:nth-child(3) { animation: waveAnim 1s ease-in-out infinite 0.5s; }
+
+    @keyframes waveAnim {
+      0%, 100% { height: 3px; }
+      50% { height: 12px; }
+    }
+
+    /* Right-Side Roman Numeral Navigation Rail */
+    .side-nav-rail {
+      position: fixed;
+      right: 48px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 100;
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .side-rail-track {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: -12px;
+      width: 1px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .side-rail-progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 0%;
+      background: linear-gradient(180deg, var(--gold-primary), var(--gold-light));
+      box-shadow: 0 0 8px var(--gold-glow);
+      transition: height 0.15s ease-out;
+    }
+
+    .rail-item {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      color: rgba(244, 236, 225, 0.38);
+      cursor: pointer;
+      position: relative;
+      padding: 6px 10px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .rail-item:hover {
+      color: var(--sand-light);
+      transform: translateX(-3px);
+    }
+
+    .rail-item.active {
+      color: var(--gold-light);
+      font-weight: 600;
+      text-shadow: 0 0 12px var(--gold-glow);
+    }
+
+    .rail-item-arch {
+      position: absolute;
+      right: -28px;
+      width: 14px;
+      height: 18px;
+      border: 1px solid var(--gold-primary);
+      border-bottom: none;
+      border-top-left-radius: 7px;
+      border-top-right-radius: 7px;
+      opacity: 0;
+      transform: scale(0.6);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .rail-item.active .rail-item-arch {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Chapter Text Overlay Over Canvas */
+    .chapter-overlay-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    .chapter-view {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 8vw;
+      transform: translateY(18px);
+      pointer-events: none;
+    }
+
+    .chapter-view.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      pointer-events: none;
+    }
+
+    .chapter-view a, 
+    .chapter-view button,
+    .chapter-view input,
+    .chapter-view textarea,
+    .chapter-view .scroll-enter-badge,
+    .chapter-view .detail-col a,
+    .chapter-view .btn-gold-primary,
+    .chapter-view .btn-outline-back {
+      pointer-events: auto;
+    }
+
+    /* Alignments matching video */
+    .chapter-view.align-left {
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .chapter-view.align-right {
+      align-items: flex-end;
+      text-align: right;
+    }
+
+    .chapter-content-box {
+      max-width: 580px;
+      pointer-events: auto;
+    }
+
+    .chapter-subhead {
+      font-family: var(--font-sans);
+      font-size: 0.68rem;
+      font-weight: 400;
+      letter-spacing: 0.38em;
+      color: rgba(229, 195, 120, 0.85);
+      text-transform: uppercase;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .align-right .chapter-subhead {
+      justify-content: flex-end;
+    }
+
+    .chapter-heading {
+      font-family: var(--font-serif);
+      font-size: clamp(2.6rem, 5.2vw, 4.2rem);
+      font-weight: 300;
+      line-height: 1.14;
+      color: #FAF4EB;
+      margin-bottom: 24px;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.85);
+      letter-spacing: -0.01em;
+    }
+
+    .chapter-heading em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+
+    .chapter-arch-motif {
+      width: 32px;
+      height: 24px;
+      border: 1px solid rgba(212, 175, 55, 0.6);
+      border-bottom: none;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      margin-bottom: 18px;
+    }
+
+    .align-right .chapter-arch-motif {
+      margin-left: auto;
+    }
+
+    .chapter-desc {
+      font-family: var(--font-serif);
+      font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+      font-weight: 300;
+      line-height: 1.5;
+      color: rgba(244, 236, 225, 0.88);
+      text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+      max-width: 480px;
+    }
+
+    /* Chapter 1 Bottom "Scroll to Enter" */
+    .scroll-enter-badge {
+      position: absolute;
+      bottom: 44px;
+      left: 8vw;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: transform 0.3s ease;
+    }
+
+    .scroll-enter-badge:hover {
+      transform: translateY(4px);
+    }
+
+    .scroll-enter-badge span {
+      font-family: var(--font-sans);
+      font-size: 0.65rem;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+      color: rgba(244, 236, 225, 0.75);
+    }
+
+    .scroll-arch-indicator {
+      width: 28px;
+      height: 22px;
+      border: 1px solid var(--gold-primary);
+      border-bottom: none;
+      border-top-left-radius: 14px;
+      border-top-right-radius: 14px;
+      position: relative;
+      animation: pulseArch 2.2s infinite ease-in-out;
+    }
+
+    @keyframes pulseArch {
+      0%, 100% { transform: translateY(0); opacity: 0.7; }
+      50% { transform: translateY(6px); opacity: 1; }
+    }
+
+    /* Chapter V (Terrace) Bottom Info & Action Bar */
+    .chapter-five-details {
+      position: absolute;
+      bottom: 44px;
+      left: 8vw;
+      right: 8vw;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr) auto;
+      align-items: flex-end;
+      gap: 36px;
+      pointer-events: auto;
+      border-top: 1px solid rgba(212, 175, 55, 0.2);
+      padding-top: 24px;
+    }
+
+    .detail-col {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .detail-col h4 {
+      font-family: var(--font-sans);
+      font-size: 0.62rem;
+      letter-spacing: 0.35em;
+      color: var(--gold-light);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .detail-col p, .detail-col a {
+      font-family: var(--font-serif);
+      font-size: 0.95rem;
+      color: rgba(244, 236, 225, 0.85);
+      line-height: 1.4;
+      text-decoration: none;
+    }
+
+    .detail-col a:hover {
+      color: var(--gold-light);
+    }
+
+    .action-button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 220px;
+    }
+
+    .btn-gold-primary {
+      background: var(--gold-primary);
+      color: #0F0C08;
+      font-family: var(--font-sans);
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      border: 1px solid var(--gold-primary);
+      border-radius: 999px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 24px var(--gold-glow);
+    }
+
+    .btn-gold-primary:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(229, 195, 120, 0.5);
+    }
+
+    .btn-outline-back {
+      background: rgba(18, 14, 11, 0.6);
+      color: var(--sand-light);
+      font-family: var(--font-sans);
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      padding: 12px 24px;
+      border: 1px solid rgba(244, 236, 225, 0.3);
+      border-radius: 999px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .btn-outline-back:hover {
+      border-color: var(--gold-primary);
+      color: var(--gold-light);
+    }
+
+    .chapter-five-footer {
+      position: absolute;
+      bottom: 12px;
+      left: 8vw;
+      right: 8vw;
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-sans);
+      font-size: 0.58rem;
+      letter-spacing: 0.35em;
+      color: rgba(244, 236, 225, 0.4);
+      text-transform: uppercase;
+    }
+
+    /* Preloader Overlay */
+    #preloader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #0D0A08;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.9s;
+    }
+
+    #preloader.loaded {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .preloader-emblem {
+      width: 60px;
+      height: 75px;
+      border: 1.5px solid var(--gold-primary);
+      border-bottom: none;
+      border-top-left-radius: 30px;
+      border-top-right-radius: 30px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .preloader-emblem::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      background: var(--gold-primary);
+      border-radius: 50%;
+      box-shadow: 0 0 16px var(--gold-light);
+    }
+
+    .preloader-title {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      letter-spacing: 0.6em;
+      color: var(--sand-light);
+      text-align: center;
+    }
+
+    .preloader-bar-wrap {
+      width: 240px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .preloader-bar-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--gold-dark), var(--gold-light));
+      transition: width 0.15s ease-out;
+    }
+
+    .preloader-status {
+      font-family: var(--font-sans);
+      font-size: 0.6rem;
+      letter-spacing: 0.35em;
+      color: rgba(229, 195, 120, 0.7);
+      text-transform: uppercase;
+    }
+
+    /* Luxury Reservation Modal Drawer */
+    .reserve-modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(8, 6, 4, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .reserve-modal-backdrop.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .reserve-modal-drawer {
+      width: 100%;
+      max-width: 540px;
+      height: 100%;
+      background: #110E0B;
+      border-left: 1px solid rgba(212, 175, 55, 0.25);
+      padding: 48px;
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      box-shadow: -20px 0 50px rgba(0,0,0,0.8);
+    }
+
+    .reserve-modal-backdrop.open .reserve-modal-drawer {
+      transform: translateX(0);
+    }
+
+    .modal-close-btn {
+      align-self: flex-end;
+      background: transparent;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      color: var(--sand-light);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .modal-close-btn:hover {
+      border-color: var(--gold-light);
+      color: var(--gold-light);
+      transform: rotate(90deg);
+    }
+
+    .modal-header h3 {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      letter-spacing: 0.35em;
+      color: var(--gold-light);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .modal-header p {
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      color: var(--sand-muted);
+      line-height: 1.5;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group label {
+      font-family: var(--font-sans);
+      font-size: 0.65rem;
+      letter-spacing: 0.28em;
+      color: var(--gold-light);
+      text-transform: uppercase;
+    }
+
+    .form-control {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      border-radius: 6px;
+      padding: 12px 16px;
+      color: var(--sand-light);
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 10px var(--gold-glow);
+    }
+
+    .suite-card-select {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .suite-option {
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      border-radius: 8px;
+      padding: 16px;
+      background: rgba(255,255,255,0.02);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .suite-option:hover, .suite-option.selected {
+      border-color: var(--gold-primary);
+      background: rgba(212, 175, 55, 0.08);
+    }
+
+    .suite-option h5 {
+      font-family: var(--font-serif);
+      font-size: 1.15rem;
+      color: var(--sand-light);
+      margin-bottom: 2px;
+    }
+
+    .suite-option span {
+      font-family: var(--font-sans);
+      font-size: 0.65rem;
+      color: rgba(244, 236, 225, 0.6);
+      letter-spacing: 0.1em;
+    }
+
+    .suite-price {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      color: var(--gold-light);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 900px) {
+      header.site-header {
+        padding: 20px 24px;
+      }
+      .nav-group-left {
+        display: none;
+      }
+      .side-nav-rail {
+        right: 18px;
+      }
+      .chapter-view {
+        padding: 0 6vw;
+      }
+      .chapter-heading {
+        font-size: 2.2rem;
+      }
+      .chapter-five-details {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        bottom: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Custom Cursor -->
+  <div class="custom-cursor" id="cursor"></div>
+  <div class="custom-cursor-dot" id="cursor-dot"></div>
+
+  <!-- Preloader Screen -->
+  <div id="preloader">
+    <div class="preloader-emblem"></div>
+    <div class="preloader-title">RANN MAHAL</div>
+    <div class="preloader-bar-wrap">
+      <div class="preloader-bar-fill" id="preloader-fill"></div>
+    </div>
+    <div class="preloader-status" id="preloader-text">GATHERING THE SUNLIGHT · 0%</div>
+  </div>
+
+  <!-- Fixed Top Header -->
+  <header class="site-header">
+    <div class="nav-group-left">
+      <a class="nav-link" onclick="scrollToChapter(0)">THE PALACE</a>
+      <a class="nav-link" onclick="scrollToChapter(1)">THE GATE</a>
+    </div>
+
+    <div class="brand-logo" onclick="scrollToChapter(0)">
+      <span class="line"></span>
+      R A N N &nbsp; M A H A L
+      <span class="line"></span>
+    </div>
+
+    <div class="nav-group-right">
+      <a class="nav-link" onclick="scrollToChapter(2)">THE COURT</a>
+      <button class="sound-toggle-btn" id="sound-btn" onclick="toggleAmbience()" title="Toggle Palace Ambient Audio">
+        <div class="sound-wave" id="sound-wave">
+          <span></span><span></span><span></span>
+        </div>
+        AMBIENCE
+      </button>
+      <button class="reserve-btn" onclick="openReservationModal()">RESERVE</button>
+    </div>
+  </header>
+
+  <!-- Right-Side Roman Numeral Navigation Rail -->
+  <nav class="side-nav-rail" aria-label="Palace Chapters Navigation">
+    <div class="side-rail-track">
+      <div class="side-rail-progress" id="rail-progress"></div>
+    </div>
+    <div class="rail-item active" data-chapter="0" onclick="scrollToChapter(0)">
+      I
+      <div class="rail-item-arch"></div>
+    </div>
+    <div class="rail-item" data-chapter="1" onclick="scrollToChapter(1)">
+      II
+      <div class="rail-item-arch"></div>
+    </div>
+    <div class="rail-item" data-chapter="2" onclick="scrollToChapter(2)">
+      III
+      <div class="rail-item-arch"></div>
+    </div>
+    <div class="rail-item" data-chapter="3" onclick="scrollToChapter(3)">
+      IV
+      <div class="rail-item-arch"></div>
+    </div>
+    <div class="rail-item" data-chapter="4" onclick="scrollToChapter(4)">
+      V
+      <div class="rail-item-arch"></div>
+    </div>
+  </nav>
+
+  <!-- Canvas Container with scrubbed frames -->
+  <div id="canvas-container">
+    <canvas id="scene-canvas"></canvas>
+  </div>
+  <div class="vignette-overlay"></div>
+
+  <!-- Real Interactive HTML Overlays for Chapters (Synchronized with Video Scroll) -->
+  <div class="chapter-overlay-container">
+    
+    <!-- Chapter I: The Palace (Hero) -->
+    <section class="chapter-view align-left active" id="chapter-0">
+      <div class="chapter-content-box">
+        <div class="chapter-subhead">THAR FRONTIER · RAJASTHAN</div>
+        <h1 class="chapter-heading">Where the desert<br>keeps its gold.</h1>
+        <div class="chapter-arch-motif"></div>
+        <p class="chapter-desc">Nine suites. Four hundred lanterns. One family at a time.</p>
+      </div>
+
+      <div class="scroll-enter-badge" onclick="scrollToChapter(1)">
+        <div class="scroll-arch-indicator"></div>
+        <span>SCROLL TO ENTER</span>
+      </div>
+    </section>
+
+    <!-- Chapter II: The Gate -->
+    <section class="chapter-view align-right" id="chapter-1">
+      <div class="chapter-content-box">
+        <div class="chapter-subhead">CHAPTER II · THE GATE</div>
+        <h2 class="chapter-heading">Nine feet of teak,<br>opened once a day.</h2>
+        <div class="chapter-arch-motif"></div>
+        <p class="chapter-desc">Eleven months of carving. Closed at dusk, opened for you alone.</p>
+      </div>
+    </section>
+
+    <!-- Chapter III: The Water Court -->
+    <section class="chapter-view align-left" id="chapter-2">
+      <div class="chapter-content-box">
+        <div class="chapter-subhead">CHAPTER III · THE WATER COURT</div>
+        <h2 class="chapter-heading">A courtyard built<br>to hold the evening.</h2>
+        <div class="chapter-arch-motif"></div>
+        <p class="chapter-desc">Forty metres of still water. Dinner is laid along its edge.</p>
+      </div>
+    </section>
+
+    <!-- Chapter IV: The Colonnade -->
+    <section class="chapter-view align-right" id="chapter-3">
+      <div class="chapter-content-box">
+        <div class="chapter-subhead">CHAPTER IV · THE COLONNADE</div>
+        <h2 class="chapter-heading">Sixty columns.<br>One view.</h2>
+        <div class="chapter-arch-motif"></div>
+        <p class="chapter-desc">The hall runs the width of the palace and stops at nothing but sky.</p>
+      </div>
+    </section>
+
+    <!-- Chapter V: The Terrace & Grand Footer -->
+    <section class="chapter-view align-left" id="chapter-4">
+      <div class="chapter-content-box" style="margin-top: -60px;">
+        <div class="chapter-subhead">CHAPTER V · THE TERRACE</div>
+        <h2 class="chapter-heading">Stay until the sun<br>clears the fields.</h2>
+        <div class="chapter-arch-motif"></div>
+        <p class="chapter-desc">October to March. One booking held per night.</p>
+      </div>
+
+      <div class="chapter-five-details">
+        <div class="detail-col">
+          <h4>VISIT</h4>
+          <p>Jaisalmer District<br>Rajasthan 345001<br>India</p>
+        </div>
+
+        <div class="detail-col">
+          <h4>ENQUIRE</h4>
+          <p><a href="tel:+91294000000">+91 294 000 000</a><br><a href="mailto:stay@rannmahal.in">stay@rannmahal.in</a><br>Reservations, 9–6 IST</p>
+        </div>
+
+        <div class="detail-col">
+          <h4>THE HOUSE</h4>
+          <p>Nine suites<br>Private dining<br>Stables & step-well</p>
+        </div>
+
+        <div class="action-button-group">
+          <button class="btn-gold-primary" onclick="openReservationModal()">RESERVE THE PALACE</button>
+          <button class="btn-outline-back" onclick="scrollToChapter(1)">RETURN TO THE GATE</button>
+        </div>
+      </div>
+
+      <div class="chapter-five-footer">
+        <span>RANN MAHAL</span>
+        <span>EST. 1884 · RESTORED 2019</span>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Reservation Modal Drawer -->
+  <div class="reserve-modal-backdrop" id="reserve-modal" onclick="handleBackdropClick(event)">
+    <div class="reserve-modal-drawer">
+      <button class="modal-close-btn" onclick="closeReservationModal()">✕</button>
+
+      <div class="modal-header">
+        <h3>Private Estate Hold</h3>
+        <p>Rann Mahal is reserved exclusively for a single party at any given time. Please enter your preferred dates below.</p>
+      </div>
+
+      <form id="booking-form" onsubmit="handleReserveSubmit(event)" style="display:flex; flex-direction:column; gap:20px;">
+        <div class="form-group">
+          <label>Lead Guest Name</label>
+          <input type="text" class="form-control" placeholder="e.g. Lord & Lady Hamilton" required>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div class="form-group">
+            <label>Arrival</label>
+            <input type="date" class="form-control" required value="2026-11-14">
+          </div>
+          <div class="form-group">
+            <label>Departure</label>
+            <input type="date" class="form-control" required value="2026-11-18">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Sanctuary Selection</label>
+          <div class="suite-card-select">
+            <div class="suite-option selected" onclick="selectSuite(this, 'The Entire Royal Estate', '₹4,50,000 / night')">
+              <div>
+                <h5>The Entire Palace Estate</h5>
+                <span>All 9 Suites · 400 Lanterns · Exclusive Royal Staff</span>
+              </div>
+              <div class="suite-price">₹4,50,000<span style="font-size:0.6rem; color:var(--sand-muted)">/nt</span></div>
+            </div>
+
+            <div class="suite-option" onclick="selectSuite(this, 'The Maharana Pavilion', '₹2,20,000 / night')">
+              <div>
+                <h5>The Maharana Pavilion</h5>
+                <span>6,200 sq ft · Private Plunge Pool & Fountain Courtyard</span>
+              </div>
+              <div class="suite-price">₹2,20,000<span style="font-size:0.6rem; color:var(--sand-muted)">/nt</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Bespoke Requests & Dining</label>
+          <textarea class="form-control" rows="2" placeholder="Dietary preferences, private desert camel cavalcade, sunset sitar concert..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-gold-primary" style="margin-top:12px; width:100%;">REQUEST PRIVATE INVITATION</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scroll Height Container -->
+  <div id="scroll-container"></div>
+
+  <script>
+    /* =========================================================================
+       RANN MAHAL — LUXURY SCROLL ENGINE & PRELOADER
+       ========================================================================= */
+
+    const TOTAL_FRAMES = 143;
+    const FRAME_PATH = (i) => `assets/frames/frame_${String(i).padStart(3, '0')}.webp`;
+
+    // Chapter frame thresholds (matching the exact video beats)
+    const CHAPTERS = [
+      { id: 0, frame: 0,   name: "THE PALACE",   scroll: 0.00 },
+      { id: 1, frame: 45,  name: "THE GATE",     scroll: 0.28 },
+      { id: 2, frame: 75,  name: "THE COURT",    scroll: 0.52 },
+      { id: 3, frame: 105, name: "THE COLONNADE", scroll: 0.74 },
+      { id: 4, frame: 140, name: "THE TERRACE",  scroll: 0.98 }
+    ];
+
+    const canvas = document.getElementById('scene-canvas');
+    const ctx = canvas.getContext('2d');
+    const preloader = document.getElementById('preloader');
+    const preloaderFill = document.getElementById('preloader-fill');
+    const preloaderText = document.getElementById('preloader-text');
+    const railProgress = document.getElementById('rail-progress');
+    const railItems = document.querySelectorAll('.rail-item');
+    const chapterViews = document.querySelectorAll('.chapter-view');
+
+    // Preloaded image array
+    const images = [];
+    let loadedCount = 0;
+    let isReady = false;
+
+    // Smooth inertia scroll state
+    let targetScroll = 0;
+    let currentScroll = 0;
+    let currentFrame = 0;
+    let targetFrame = 0;
+    let activeChapterIndex = 0;
+
+    // Resize Canvas to device pixel ratio
+    function resizeCanvas() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      renderCurrentFrame();
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    // Preloader and Asset Streamer
+    function dismissPreloader() {
+      if (preloader) {
+        preloader.classList.add('loaded');
+      }
+    }
+    // Safety timeout: dismiss preloader after 1.5s max even if some frames take longer
+    setTimeout(dismissPreloader, 1500);
+    preloader.addEventListener('click', dismissPreloader);
+
+    function preloadFrames() {
+      for (let i = 0; i < TOTAL_FRAMES; i++) {
+        const img = new Image();
+        img.src = FRAME_PATH(i);
+        const onFinish = () => {
+          loadedCount++;
+          const percent = Math.floor((loadedCount / TOTAL_FRAMES) * 100);
+          if (preloaderFill) preloaderFill.style.width = percent + '%';
+          if (preloaderText) preloaderText.innerText = `GATHERING THE SUNLIGHT · ${percent}%`;
+
+          // Once first 3 frames are ready, allow immediate viewing
+          if (!isReady && loadedCount >= 3) {
+            isReady = true;
+            resizeCanvas();
+            renderFrame(0);
+          }
+
+          if (loadedCount >= TOTAL_FRAMES) {
+            setTimeout(dismissPreloader, 250);
+          }
+        };
+        img.onload = onFinish;
+        img.onerror = onFinish;
+        images.push(img);
+      }
+    }
+
+    // Draw the image onto canvas using aspect-cover fit
+    function drawImageCover(img) {
+      if (!img || !img.complete || img.naturalWidth === 0) return;
+
+      const cw = canvas.width;
+      const ch = canvas.height;
+      const iw = img.naturalWidth;
+      const ih = img.naturalHeight;
+
+      const scale = Math.max(cw / iw, ch / ih);
+      const nw = iw * scale;
+      const nh = ih * scale;
+      const ox = (cw - nw) / 2;
+      const oy = (ch - nh) / 2;
+
+      ctx.clearRect(0, 0, cw, ch);
+      ctx.drawImage(img, ox, oy, nw, nh);
+    }
+
+    function renderFrame(index) {
+      const safeIndex = Math.max(0, Math.min(TOTAL_FRAMES - 1, Math.round(index)));
+      const img = images[safeIndex];
+      if (img && img.complete) {
+        drawImageCover(img);
+      }
+    }
+
+    function renderCurrentFrame() {
+      renderFrame(currentFrame);
+    }
+
+    // Smooth Animation Loop
+    function updateLoop() {
+      // Linear interpolation (lerp) for buttery smooth cinematic inertia
+      currentScroll += (targetScroll - currentScroll) * 0.095;
+      targetFrame = currentScroll * (TOTAL_FRAMES - 1);
+      currentFrame += (targetFrame - currentFrame) * 0.15;
+
+      renderCurrentFrame();
+
+      // Update right rail progress bar
+      if (railProgress) {
+        railProgress.style.height = `${currentScroll * 100}%`;
+      }
+
+      // Determine active chapter
+      let newActiveIndex = 0;
+      if (currentScroll < 0.16) {
+        newActiveIndex = 0;
+      } else if (currentScroll < 0.42) {
+        newActiveIndex = 1;
+      } else if (currentScroll < 0.65) {
+        newActiveIndex = 2;
+      } else if (currentScroll < 0.86) {
+        newActiveIndex = 3;
+      } else {
+        newActiveIndex = 4;
+      }
+
+      if (newActiveIndex !== activeChapterIndex) {
+        activeChapterIndex = newActiveIndex;
+        updateActiveChapterUI(activeChapterIndex);
+      }
+
+      requestAnimationFrame(updateLoop);
+    }
+
+    function updateActiveChapterUI(index) {
+      railItems.forEach((item, idx) => {
+        item.classList.toggle('active', idx === index);
+      });
+
+      chapterViews.forEach((view, idx) => {
+        view.classList.toggle('active', idx === index);
+      });
+    }
+
+    // Native scroll listener on window
+    function handleScrollEvent() {
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      targetScroll = Math.max(0, Math.min(1, window.scrollY / maxScroll));
+    }
+    window.addEventListener('scroll', handleScrollEvent, { passive: true });
+
+    // Direct wheel event for instant responsiveness
+    window.addEventListener('wheel', (e) => {
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const newY = Math.max(0, Math.min(maxScroll, window.scrollY + e.deltaY));
+      window.scrollTo(0, newY);
+      targetScroll = newY / maxScroll;
+    }, { passive: true });
+
+    // Direct touch event for mobile & touchscreens
+    let touchStartY = 0;
+    window.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 0) touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) {
+        const curY = e.touches[0].clientY;
+        const delta = touchStartY - curY;
+        touchStartY = curY;
+        const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+        const newY = Math.max(0, Math.min(maxScroll, window.scrollY + delta * 2.2));
+        window.scrollTo(0, newY);
+        targetScroll = newY / maxScroll;
+      }
+    }, { passive: true });
+
+    // Click to jump to a specific chapter smoothly
+    window.scrollToChapter = function(chapterId) {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const chapter = CHAPTERS[chapterId];
+      if (!chapter) return;
+
+      const destY = chapter.scroll * maxScroll;
+      window.scrollTo({
+        top: destY,
+        behavior: 'smooth'
+      });
+    };
+
+    /* =========================================================================
+       CUSTOM CURSOR
+       ========================================================================= */
+    const cursor = document.getElementById('cursor');
+    const cursorDot = document.getElementById('cursor-dot');
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let curX = mouseX;
+    let curY = mouseY;
+
+    window.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      cursorDot.style.left = mouseX + 'px';
+      cursorDot.style.top = mouseY + 'px';
+    });
+
+    function cursorLoop() {
+      curX += (mouseX - curX) * 0.18;
+      curY += (mouseY - curY) * 0.18;
+      cursor.style.left = curX + 'px';
+      cursor.style.top = curY + 'px';
+      requestAnimationFrame(cursorLoop);
+    }
+    cursorLoop();
+
+    document.querySelectorAll('a, button, .rail-item, .suite-option').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('cursor-hover'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('cursor-hover'));
+    });
+
+    /* =========================================================================
+       AMBIENT SOUNDSCAPE (Web Audio API Generative Drone & Chimes)
+       ========================================================================= */
+    let audioCtx = null;
+    let isPlayingAudio = false;
+    let masterGain = null;
+    let oscillators = [];
+
+    function initAmbience() {
+      if (audioCtx) return;
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AudioContext();
+
+      masterGain = audioCtx.createGain();
+      masterGain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+      masterGain.connect(audioCtx.destination);
+
+      // Warm Rajasthani tanpura & desert wind resonance chords (D / A / D octaves with slow beat frequency)
+      const freqs = [73.42, 110.00, 146.83, 220.00, 293.66]; // D2, A2, D3, A3, D4
+      freqs.forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        const oscGain = audioCtx.createGain();
+        osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
+        osc.frequency.setValueAtTime(freq + (Math.random() * 0.4 - 0.2), audioCtx.currentTime);
+
+        // Low-pass filter for evening warmth
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(450 + idx * 80, audioCtx.currentTime);
+
+        oscGain.gain.setValueAtTime(0.04 / (idx + 1), audioCtx.currentTime);
+        osc.connect(filter);
+        filter.connect(oscGain);
+        oscGain.connect(masterGain);
+        osc.start();
+        oscillators.push(osc);
+      });
+
+      // Subtle breeze noise generator
+      const bufferSize = audioCtx.sampleRate * 2;
+      const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+      const whiteNoise = audioCtx.createBufferSource();
+      whiteNoise.buffer = noiseBuffer;
+      whiteNoise.loop = true;
+
+      const noiseFilter = audioCtx.createBiquadFilter();
+      noiseFilter.type = 'bandpass';
+      noiseFilter.frequency.setValueAtTime(280, audioCtx.currentTime);
+      noiseFilter.Q.setValueAtTime(1.5, audioCtx.currentTime);
+
+      const noiseGain = audioCtx.createGain();
+      noiseGain.gain.setValueAtTime(0.012, audioCtx.currentTime);
+
+      whiteNoise.connect(noiseFilter);
+      noiseFilter.connect(noiseGain);
+      noiseGain.connect(masterGain);
+      whiteNoise.start();
+    }
+
+    window.toggleAmbience = function() {
+      initAmbience();
+      const wave = document.getElementById('sound-wave');
+      const btn = document.getElementById('sound-btn');
+
+      if (!isPlayingAudio) {
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        masterGain.gain.setTargetAtTime(0.35, audioCtx.currentTime, 1.2);
+        isPlayingAudio = true;
+        wave.classList.add('playing');
+        btn.style.borderColor = 'var(--gold-light)';
+        btn.style.color = 'var(--gold-light)';
+      } else {
+        masterGain.gain.setTargetAtTime(0.0001, audioCtx.currentTime, 0.8);
+        isPlayingAudio = false;
+        wave.classList.remove('playing');
+        btn.style.borderColor = 'rgba(212, 175, 55, 0.28)';
+        btn.style.color = 'var(--sand-light)';
+      }
+    };
+
+    /* =========================================================================
+       RESERVATION MODAL DRAWER
+       ========================================================================= */
+    const reserveModal = document.getElementById('reserve-modal');
+
+    window.openReservationModal = function() {
+      reserveModal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    };
+
+    window.closeReservationModal = function() {
+      reserveModal.classList.remove('open');
+      document.body.style.overflow = '';
+    };
+
+    window.handleBackdropClick = function(e) {
+      if (e.target === reserveModal) {
+        closeReservationModal();
+      }
+    };
+
+    window.selectSuite = function(card, name, price) {
+      document.querySelectorAll('.suite-option').forEach(el => el.classList.remove('selected'));
+      card.classList.add('selected');
+    };
+
+    window.handleReserveSubmit = function(e) {
+      e.preventDefault();
+      alert('Your private invitation request for Rann Mahal has been received. Our Master of the Palace will reach out directly within two hours.');
+      closeReservationModal();
+    };
+
+    // Keyboard navigation (Arrow keys & Space)
+    window.addEventListener('keydown', (e) => {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const step = maxScroll / 5;
+      if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+        window.scrollBy({ top: step * 0.6, behavior: 'smooth' });
+      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+        window.scrollBy({ top: -step * 0.6, behavior: 'smooth' });
+      }
+    });
+
+    // Start loading and loops
+    preloadFrames();
+    updateLoop();
+
+  </script>
+</body>
+</html>
